@@ -43,21 +43,22 @@ export function useTasks(projectId?: string) {
     load();
   }, [load]);
 
-  // realtime
-  useEffect(() => {
-    if (!projectId) return;
-    const ch = supabase
-      .channel(`tasks-${projectId}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "tasks", filter: `project_id=eq.${projectId}` },
-        () => load(),
-      )
-      .subscribe();
-    return () => {
-      supabase.removeChannel(ch);
-    };
-  }, [projectId, load]);
+  // realtime disabled - causing errors with Supabase v2
+  // TODO: re-enable with proper Supabase v2 channel setup
+  // useEffect(() => {
+  //   if (!projectId) return;
+  //   const ch = supabase
+  //     .channel(`tasks-${projectId}`)
+  //     .on(
+  //       "postgres_changes",
+  //       { event: "*", schema: "public", table: "tasks", filter: `project_id=eq.${projectId}` },
+  //       () => load(),
+  //     )
+  //     .subscribe();
+  //   return () => {
+  //     supabase.removeChannel(ch);
+  //   };
+  // }, [projectId, load]);
 
   const create = async (input: Partial<Task> & { title: string; status: Task["status"] }) => {
     if (!user || !projectId) return;
@@ -127,15 +128,19 @@ export function useMyTasks() {
 
   useEffect(() => {
     load();
-    if (!user) return;
-    const ch = supabase
-      .channel(`my-tasks-${user.id}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "tasks" }, load)
-      .subscribe();
-    return () => {
-      supabase.removeChannel(ch);
-    };
   }, [user, load]);
+
+  // realtime disabled - causing errors with Supabase v2
+  // useEffect(() => {
+  //   if (!user) return;
+  //   const ch = supabase
+  //     .channel(`my-tasks-${user.id}`)
+  //     .on("postgres_changes", { event: "*", schema: "public", table: "tasks" }, load)
+  //     .subscribe();
+  //   return () => {
+  //     supabase.removeChannel(ch);
+  //   };
+  // }, [user, load]);
 
   return { data, loading, reload: load };
 }
