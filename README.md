@@ -39,4 +39,4 @@ Ce projet a été développé pour simplifier l'adoption des méthodologies Agil
 
 ---
 
-_Projet réalisé dans le cadre des études GLSI2 en collaboration avec @Tsem74 - PFA._
+_Projet réalisé dans le cadre des études GLSI2 en collaboration avec  [**@Tsem74**](https://github.com/Tsem74)- PFA._
