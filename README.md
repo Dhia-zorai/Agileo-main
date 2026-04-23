@@ -27,7 +27,7 @@ Ce projet a été développé pour simplifier l'adoption des méthodologies Agil
 1. **Cloner le projet**
 
    ```bash
-   git clone https://github.com/Dhia-zorai/Agileo.git
+   git clone https://github.com/Dhia-zorai/Agileo-main.git
    cd Agileo
    ```
 
@@ -35,8 +35,8 @@ Ce projet a été développé pour simplifier l'adoption des méthodologies Agil
    ```bash
    npm run dev
    ```
-   _Le frontend sera disponible sur `http://localhost:5173` et le backend sur `http://localhost:8000`._
+   _Le site sera disponible sur `http://localhost:8000`._
 
 ---
 
-_Projet réalisé dans le cadre des études GLSI2 - PFA._
+_Projet réalisé dans le cadre des études GLSI2 en collaboration avec @Tsem74 - PFA._
