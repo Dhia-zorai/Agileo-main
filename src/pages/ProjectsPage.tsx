@@ -13,7 +13,7 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { EmptyState } from "@/components/EmptyState";
 
 export default function ProjectsPage() {
-  const { data, loading } = useProjects();
+  const { data, loading, reload: reloadProjects } = useProjects();
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -47,7 +47,10 @@ export default function ProjectsPage() {
       </div>
 
       <SlidePanel open={open} onClose={() => setOpen(false)} title="New project">
-        <ProjectForm onDone={() => setOpen(false)} />
+        <ProjectForm onDone={() => {
+          setOpen(false);
+          reloadProjects();
+        }} />
       </SlidePanel>
     </AppShell>
   );

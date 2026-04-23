@@ -25,7 +25,7 @@ import { format, isValid, parseISO } from "date-fns";
 const COLUMNS: Task["status"][] = ["TODO", "IN_PROGRESS", "IN_REVIEW", "DONE"];
 
 export function KanbanBoard({ projectId }: { projectId: string }) {
-  const { data: tasks, loading, updateStatus } = useTasks(projectId);
+  const { data: tasks, loading, updateStatus, reload: reloadTasks } = useTasks(projectId);
   const { data: members } = useMembers(projectId);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [addStatus, setAddStatus] = useState<Task["status"] | null>(null);
@@ -84,7 +84,10 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
         title={`New task — ${addStatus ? STATUS_LABEL[addStatus] : ""}`}
       >
         {addStatus && (
-          <TaskForm projectId={projectId} defaultStatus={addStatus} onDone={() => setAddStatus(null)} />
+          <TaskForm projectId={projectId} defaultStatus={addStatus} onDone={() => {
+            setAddStatus(null);
+            reloadTasks();
+          }} />
         )}
       </SlidePanel>
     </>

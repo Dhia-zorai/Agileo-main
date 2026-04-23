@@ -83,6 +83,7 @@ export function useTasks(projectId?: string) {
       return null;
     }
     toast.success("Task created");
+    setData((d) => [...d, row as Task]);
     return row as Task;
   };
 
