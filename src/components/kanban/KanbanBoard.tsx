@@ -12,7 +12,7 @@ import {
   useDroppable,
   closestCorners,
 } from "@dnd-kit/core";
-import { Plus, AlertTriangle } from "lucide-react";
+import { Plus, AlertTriangle, Trash2 } from "lucide-react";
 import { useTasks, type Task } from "@/hooks/useTasks";
 import { useMembers } from "@/hooks/useMembers";
 import { Avatar } from "@/components/Avatar";
@@ -21,14 +21,16 @@ import { TaskForm } from "@/components/tasks/TaskForm";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { PRIORITY_BAR, STATUS_LABEL } from "@/lib/colors";
 import { format, isValid, parseISO } from "date-fns";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 
 const COLUMNS: Task["status"][] = ["TODO", "IN_PROGRESS", "IN_REVIEW", "DONE"];
 
 export function KanbanBoard({ projectId }: { projectId: string }) {
-  const { data: tasks, loading, updateStatus, reload: reloadTasks } = useTasks(projectId);
+  const { data: tasks, loading, updateStatus, reload: reloadTasks, remove: removeTask } = useTasks(projectId);
   const { data: members } = useMembers(projectId);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [addStatus, setAddStatus] = useState<Task["status"] | null>(null);
+  const [confirmTaskId, setConfirmTaskId] = useState<string | null>(null);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
@@ -70,6 +72,7 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
               tasks={byStatus[status]}
               memberById={memberById}
               onAdd={() => setAddStatus(status)}
+              onCardDelete={setConfirmTaskId}
             />
           ))}
         </div>
@@ -90,12 +93,21 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
           }} />
         )}
       </SlidePanel>
+
+      <ConfirmDialog
+        open={!!confirmTaskId}
+        onOpenChange={(v) => !v && setConfirmTaskId(null)}
+        title="Delete task?"
+        description="This action cannot be undone."
+        confirmLabel="Delete"
+        onConfirm={() => confirmTaskId && removeTask(confirmTaskId)}
+      />
     </>
   );
 }
 
-function Column({ status, tasks, memberById, onAdd }: {
-  status: Task["status"]; tasks: Task[]; memberById: Record<string, any>; onAdd: () => void;
+function Column({ status, tasks, memberById, onAdd, onCardDelete }: {
+  status: Task["status"]; tasks: Task[]; memberById: Record<string, any>; onAdd: () => void; onCardDelete: (id: string) => void;
 }) {
   const { isOver, setNodeRef } = useDroppable({ id: status });
   const wip = tasks.length > 5;
@@ -128,7 +140,12 @@ function Column({ status, tasks, memberById, onAdd }: {
 
       <div className="flex flex-col gap-2 min-h-[40px]">
         {tasks.map((t) => (
-          <DraggableTask key={t.id} task={t} member={memberById[t.assignee_id ?? ""]} />
+          <DraggableTask
+            key={t.id}
+            task={t}
+            member={memberById[t.assignee_id ?? ""]}
+            onDelete={() => onCardDelete(t.id)}
+          />
         ))}
         {tasks.length === 0 && (
           <div className="text-xs text-muted-foreground text-center py-6">Drop tasks here</div>
@@ -138,7 +155,7 @@ function Column({ status, tasks, memberById, onAdd }: {
   );
 }
 
-function DraggableTask({ task, member }: { task: Task; member?: any }) {
+function DraggableTask({ task, member, onDelete }: { task: Task; member?: any; onDelete: () => void }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: task.id });
   return (
     <div
@@ -147,16 +164,16 @@ function DraggableTask({ task, member }: { task: Task; member?: any }) {
       {...listeners}
       className={isDragging ? "opacity-30" : ""}
     >
-      <TaskCardView task={task} member={member} />
+      <TaskCardView task={task} member={member} onDelete={onDelete} />
     </div>
   );
 }
 
-function TaskCardView({ task, member, dragging }: { task: Task; member?: any; dragging?: boolean }) {
+function TaskCardView({ task, member, dragging, onDelete }: { task: Task; member?: any; dragging?: boolean; onDelete?: () => void }) {
   const due = task.due_date ? parseISO(task.due_date) : null;
   return (
     <article
-      className={`relative bg-card rounded-2xl p-3 pl-4 cursor-grab active:cursor-grabbing select-none ${dragging ? "shadow-shell rotate-2" : "shadow-card"}`}
+      className={`relative bg-card rounded-2xl p-3 pl-4 cursor-grab active:cursor-grabbing select-none group ${dragging ? "shadow-shell rotate-2" : "shadow-card"}`}
     >
       <span
         className="absolute left-0 top-3 bottom-3 w-1 rounded-r-full"
@@ -180,6 +197,16 @@ function TaskCardView({ task, member, dragging }: { task: Task; member?: any; dr
           <span className="text-[10px]">{format(due, "MMM d")}</span>
         )}
       </div>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete?.();
+        }}
+        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 w-7 h-7 rounded-full hover:bg-muted text-muted-foreground hover:text-destructive flex items-center justify-center transition-opacity"
+        aria-label="Delete task"
+      >
+        <Trash2 className="w-3.5 h-3.5" />
+      </button>
     </article>
   );
 }

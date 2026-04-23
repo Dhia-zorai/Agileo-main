@@ -1,9 +1,10 @@
 // US1 — Projects grid page.
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Folders } from "lucide-react";
+import { Plus, Folders, Trash2 } from "lucide-react";
 import { useProjects } from "@/hooks/useProjects";
 import { useMembers } from "@/hooks/useMembers";
+import { useAuth } from "@/hooks/useAuth";
 import { AppShell } from "@/components/layout/AppShell";
 import { TopBar } from "@/components/layout/TopBar";
 import { Button } from "@/components/ui/button";
@@ -11,10 +12,12 @@ import { SlidePanel } from "@/components/SlidePanel";
 import { ProjectForm } from "@/components/projects/ProjectForm";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { EmptyState } from "@/components/EmptyState";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 
 export default function ProjectsPage() {
-  const { data, loading, reload: reloadProjects } = useProjects();
+  const { data, loading, reload: reloadProjects, remove: removeProject } = useProjects();
   const [open, setOpen] = useState(false);
+  const [confirmDelId, setConfirmDelId] = useState<string | null>(null);
   const navigate = useNavigate();
 
   return (
@@ -40,7 +43,12 @@ export default function ProjectsPage() {
         ) : (
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {data.map((p) => (
-              <ProjectCard key={p.id} project={p} onClick={() => navigate(`/projects/${p.id}`)} />
+              <ProjectCard
+                key={p.id}
+                project={p}
+                onClick={() => navigate(`/projects/${p.id}`)}
+                onDelete={() => setConfirmDelId(p.id)}
+              />
             ))}
           </div>
         )}
@@ -52,12 +60,23 @@ export default function ProjectsPage() {
           reloadProjects();
         }} />
       </SlidePanel>
+
+      <ConfirmDialog
+        open={!!confirmDelId}
+        onOpenChange={(v) => !v && setConfirmDelId(null)}
+        title="Delete project?"
+        description="This will permanently delete the project and all its data."
+        confirmLabel="Delete"
+        onConfirm={() => confirmDelId && removeProject(confirmDelId)}
+      />
     </AppShell>
   );
 }
 
-function ProjectCard({ project, onClick }: { project: any; onClick: () => void }) {
+function ProjectCard({ project, onClick, onDelete }: { project: any; onClick: () => void; onDelete: () => void }) {
+  const { user } = useAuth();
   const { data: members } = useMembers(project.id);
+  const isOwner = project.owner_id === user?.id;
   return (
     <button
       onClick={onClick}
@@ -89,6 +108,18 @@ function ProjectCard({ project, onClick }: { project: any; onClick: () => void }
           {project.status}
         </span>
       </div>
+      {isOwner && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
+          className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 w-8 h-8 rounded-full hover:bg-muted text-muted-foreground hover:text-destructive flex items-center justify-center transition-opacity"
+          aria-label="Delete project"
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
+      )}
     </button>
   );
 }

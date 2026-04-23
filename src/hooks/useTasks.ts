@@ -104,6 +104,7 @@ export function useTasks(projectId?: string) {
       return;
     }
     toast.success("Task deleted");
+    setData((d) => d.filter((t) => t.id !== id));
   };
 
   return { data, loading, error, reload: load, create, updateStatus, remove };
