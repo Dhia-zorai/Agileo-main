@@ -8,19 +8,21 @@ Ce projet a été développé pour simplifier l'adoption des méthodologies Agil
 
 ## ✨ Fonctionnalités Clés
 
-- **Tableau de Bord Global** : Vue d'ensemble des statistiques de productivité et de l'état des projets.
-- **Gestion de Projet** : Création et modification de projets avec une identité visuelle propre.
-- **Kanban Interactif** : Suivi des tâches par Drag & Drop (À faire, En cours, En révision, Terminé).
-- **Gestion d'Équipe** : Invitation de membres, attribution des rôles (Scrum Master, Product Owner, Développeur).
-- **Backlog & Sprints** : Organisation du travail par sprints pour respecter les deadlines.
-- **Design Responsive** : Interface optimisée pour une utilisation fluide sur mobile, tablette et desktop.
+- **Tableau de Bord Global** : Vue d'ensemble des statistiques de productivité avec des graphiques interactifs (via Recharts).
+- **Gestion de Projet** : Création, personnalisation (couleurs, descriptions) et suppression complète de projets.
+- **Kanban Interactif** : Suivi des tâches par Drag & Drop avec @dnd-kit et persistance en base de données.
+- **Gestion d'Équipe** : Invitation de membres par email et gestion des accès sécurisée.
+- **Authentification** : Système de connexion et d'inscription sécurisé géré par Supabase Auth.
+- **Design Premium** : Interface moderne, responsive et fluide utilisant Tailwind CSS et les composants Shadcn UI.
 
 ## 🛠️ Stack Technique
 
-- **Frontend** : React 18, Vite (pour la rapidité), CSS Vanilla (Design Custom).
-- **Backend** : FastAPI (Python), Pydantic (Validation des données).
-- **Stockage** : Système de fichiers JSON persistant (Mock DB).
-- **Déploiement** : Prêt pour Vercel (Frontend + Backend Serverless).
+- **Frontend** : React 18, TypeScript, Vite (pour une expérience de développement ultra-rapide).
+- **Styling** : Tailwind CSS, Shadcn UI (Radix UI), Lucide React pour les icônes.
+- **Backend & Database** : Supabase (PostgreSQL, Auth, Real-time sync).
+- **Gestion d'État & Hooks** : React Hooks personnalisés pour une logique métier claire.
+- **Drag & Drop** : @dnd-kit pour une manipulation fluide des tâches.
+- **Déploiement** : Optimisé pour Vercel.
 
 ## 🚀 Installation Locale
 
@@ -31,11 +33,12 @@ Ce projet a été développé pour simplifier l'adoption des méthodologies Agil
    cd Agileo
    ```
 
-2. **Lancer l'application** (nécessite Node.js et Python)
+2. **Lancer l'application** (nécessite Node.js)
    ```bash
+   npm install
    npm run dev
    ```
-   _Le site sera disponible sur `http://localhost:8000`._
+   _Le site sera disponible sur `http://localhost:8080`._
 
 ---
 
