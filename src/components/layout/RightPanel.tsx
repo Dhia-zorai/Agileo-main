@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { CheckCircle2, Clock, ListTodo } from "lucide-react";
+import { type Task } from "@/hooks/useTasks";
 
 type Stats = { open: number; inProgress: number; done: number };
 
@@ -19,23 +20,24 @@ export function RightPanel() {
         .select("title, status, created_at, assignee_id")
         .order("created_at", { ascending: false })
         .limit(20);
-      const all = data ?? [];
-      const mine = all.filter((t: any) => t.assignee_id === user.id);
-      setStats({
-        open: mine.filter((t: any) => t.status === "TODO").length,
-        inProgress: mine.filter((t: any) => t.status === "IN_PROGRESS").length,
-        done: mine.filter((t: any) => t.status === "DONE").length,
-      });
+       const all = data ?? [];
+       const mine = all.filter((t: Task) => t.assignee_id === user.id);
+       setStats({
+         open: mine.filter((t: Task) => t.status === "TODO").length,
+         inProgress: mine.filter((t: Task) => t.status === "IN_PROGRESS").length,
+         done: mine.filter((t: Task) => t.status === "DONE").length,
+       });
       setRecent(all.slice(0, 5));
     };
     load();
-    const ch = supabase
-      .channel("right-panel-tasks")
-      .on("postgres_changes", { event: "*", schema: "public", table: "tasks" }, load)
-      .subscribe();
-    return () => {
-      supabase.removeChannel(ch);
-    };
+     const ch = supabase
+       .channel("right-panel-tasks")
+       .on("postgres_changes", { event: "*", schema: "public", table: "tasks" }, load)
+       .subscribe();
+     return () => {
+       // @ts-expect-error ch is used in return
+       supabase.removeChannel(ch);
+     };
   }, [user]);
 
   return (

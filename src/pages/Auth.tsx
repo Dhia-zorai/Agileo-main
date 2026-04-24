@@ -44,8 +44,9 @@ export default function Auth() {
         toast.success("Welcome back!");
       }
       navigate("/", { replace: true });
-    } catch (err: any) {
-      toast.error(err.message ?? "Authentication failed");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Authentication failed";
+      toast.error(message);
     } finally {
       setBusy(false);
     }
@@ -83,7 +84,7 @@ export default function Auth() {
             {mode === "signin" ? "Sign in to continue to AGILEO." : "Free forever for small teams."}
           </p>
 
-          <Tabs value={mode} onValueChange={(v) => setMode(v as any)} className="mb-6">
+          <Tabs value={mode} onValueChange={(v) => setMode(v as "signin" | "signup")} className="mb-6">
             <TabsList className="grid grid-cols-2 w-full bg-muted rounded-full p-1 h-11">
               <TabsTrigger value="signin" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                 Sign In

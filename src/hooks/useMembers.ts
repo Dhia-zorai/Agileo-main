@@ -4,40 +4,58 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export type Member = {
+   id: string;
+   user_id: string;
+   project_id: string;
+   profile: {
+     id: string;
+     name: string;
+     email: string;
+     avatar_color: string;
+   } | null;
+ };
+
+export type Profile = NonNullable<Member['profile']>;
+
+interface ProjectMemberRow {
   id: string;
   user_id: string;
   project_id: string;
-  profile: {
-    id: string;
-    name: string;
-    email: string;
-    avatar_color: string;
-  } | null;
-};
+}
 
-export function useMembers(projectId?: string) {
+export function useMembers(projectId?: string): { data: Member[]; loading: boolean; invite: (email: string) => Promise<boolean>; remove: (memberId: string) => Promise<void>; reload: () => void; } {
   const [data, setData] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const load = useCallback(async () => {
-    if (!projectId) return;
-    setLoading(true);
-    const { data: rows } = await supabase
-      .from("project_members")
-      .select("id, user_id, project_id")
-      .eq("project_id", projectId);
-    if (!rows) {
-      setData([]);
-      setLoading(false);
-      return;
-    }
-    const ids = rows.map((r: any) => r.user_id);
-    const { data: profiles } = await supabase.from("profiles").select("*").in("id", ids);
-    const byId: Record<string, any> = {};
-    (profiles ?? []).forEach((p: any) => (byId[p.id] = p));
-    setData(rows.map((r: any) => ({ ...r, profile: byId[r.user_id] ?? null })));
-    setLoading(false);
-  }, [projectId]);
+   const load = useCallback(async () => {
+     if (!projectId) return;
+     setLoading(true);
+     const { data: rows, error } = await supabase
+       .from("project_members")
+       .select("id, user_id, project_id")
+       .eq("project_id", projectId);
+     if (error) {
+       toast.error(error.message);
+       setLoading(false);
+       return;
+     }
+     if (!rows) {
+       setData([]);
+       setLoading(false);
+       return;
+     }
+     const ids = rows.map((r: ProjectMemberRow) => r.user_id);
+     const { data: profiles, error: profilesError } = await supabase.from("profiles").select("*").in("id", ids);
+     if (profilesError) {
+       toast.error(profilesError.message);
+       setLoading(false);
+       return;
+     }
+     const byId: Record<string, Profile> = {};
+     (profiles ?? []).forEach((p: Profile) => (byId[p.id] = p));
+     setData(rows.map((r: ProjectMemberRow) => ({ ...r, profile: byId[r.user_id] ?? null })));
+     setLoading(false);
+   }, [projectId]);
 
   useEffect(() => {
     load();
@@ -80,12 +98,12 @@ export function useMembers(projectId?: string) {
 }
 
 export function useAllProfiles() {
-  const [data, setData] = useState<{ id: string; name: string; email: string; avatar_color: string }[]>([]);
+  const [data, setData] = useState<Profile[]>([]);
   useEffect(() => {
     supabase
       .from("profiles")
       .select("*")
-      .then(({ data: rows }) => setData((rows as any) ?? []));
+      .then(({ data: rows }) => setData((rows as Profile[]) ?? []));
   }, []);
   return data;
 }

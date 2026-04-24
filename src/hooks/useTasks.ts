@@ -20,7 +20,7 @@ export type Task = {
   created_at: string;
 };
 
-export function useTasks(projectId?: string) {
+export function useTasks(projectId?: string): { data: Task[]; loading: boolean; error: string | null; reload: () => void; create: (input: Partial<Task> & { title: string; status: Task["status"] }) => Promise<Task | null>; updateStatus: (id: string, status: Task["status"]) => Promise<void>; remove: (id: string) => Promise<void>; } {
   const { user } = useAuth();
   const [data, setData] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,22 +43,21 @@ export function useTasks(projectId?: string) {
     load();
   }, [load]);
 
-  // realtime disabled - causing errors with Supabase v2
-  // TODO: re-enable with proper Supabase v2 channel setup
-  // useEffect(() => {
-  //   if (!projectId) return;
-  //   const ch = supabase
-  //     .channel(`tasks-${projectId}`)
-  //     .on(
-  //       "postgres_changes",
-  //       { event: "*", schema: "public", table: "tasks", filter: `project_id=eq.${projectId}` },
-  //       () => load(),
-  //     )
-  //     .subscribe();
-  //   return () => {
-  //     supabase.removeChannel(ch);
-  //   };
-  // }, [projectId, load]);
+  // realtime enabled – project scoped
+  useEffect(() => {
+    if (!projectId) return;
+    const ch = supabase
+      .channel(`tasks-${projectId}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "tasks", filter: `project_id=eq.${projectId}` },
+        () => load(),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(ch);
+    };
+  }, [projectId, load]);
 
   const create = async (input: Partial<Task> & { title: string; status: Task["status"] }) => {
     if (!user || !projectId) return;
@@ -132,17 +131,17 @@ export function useMyTasks() {
     load();
   }, [user, load]);
 
-  // realtime disabled - causing errors with Supabase v2
-  // useEffect(() => {
-  //   if (!user) return;
-  //   const ch = supabase
-  //     .channel(`my-tasks-${user.id}`)
-  //     .on("postgres_changes", { event: "*", schema: "public", table: "tasks" }, load)
-  //     .subscribe();
-  //   return () => {
-  //     supabase.removeChannel(ch);
-  //   };
-  // }, [user, load]);
+  // realtime enabled – user scoped
+  useEffect(() => {
+    if (!user) return;
+    const ch = supabase
+      .channel(`my-tasks-${user.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "tasks" }, load)
+      .subscribe();
+    return () => {
+      supabase.removeChannel(ch);
+    };
+  }, [user, load]);
 
   return { data, loading, reload: load };
 }

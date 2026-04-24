@@ -55,7 +55,7 @@ export function TaskForm({ projectId, defaultStatus, onDone }: Props) {
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-2">
           <Label>Priority</Label>
-          <Select value={priority} onValueChange={(v) => setPriority(v as any)}>
+           <Select value={priority} onValueChange={(v) => setPriority(v as Task["priority"])}>
             <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
             <SelectContent className="rounded-xl">
               <SelectItem value="HIGH">High</SelectItem>

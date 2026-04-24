@@ -14,7 +14,8 @@ import {
 } from "@dnd-kit/core";
 import { Plus, AlertTriangle, Trash2 } from "lucide-react";
 import { useTasks, type Task } from "@/hooks/useTasks";
-import { useMembers } from "@/hooks/useMembers";
+import { useMembers, type Member } from "@/hooks/useMembers";
+import { type Task } from "@/hooks/useTasks";
 import { Avatar } from "@/components/Avatar";
 import { SlidePanel } from "@/components/SlidePanel";
 import { TaskForm } from "@/components/tasks/TaskForm";
@@ -34,11 +35,11 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
-  const memberById = useMemo(() => {
-    const m: Record<string, any> = {};
-    members.forEach((mb) => mb.profile && (m[mb.user_id] = mb.profile));
-    return m;
-  }, [members]);
+   const memberById = useMemo(() => {
+     const m: Record<string, Profile> = {};
+     members.forEach((mb) => mb.profile && (m[mb.user_id] = mb.profile));
+     return m;
+   }, [members]);
 
   const byStatus = useMemo(() => {
     const map: Record<string, Task[]> = { TODO: [], IN_PROGRESS: [], IN_REVIEW: [], DONE: [] };
@@ -107,7 +108,7 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
 }
 
 function Column({ status, tasks, memberById, onAdd, onCardDelete }: {
-  status: Task["status"]; tasks: Task[]; memberById: Record<string, any>; onAdd: () => void; onCardDelete: (id: string) => void;
+   status: Task["status"]; tasks: Task[]; memberById: Record<string, Member | null>; onAdd: () => void; onCardDelete: (id: string) => void;
 }) {
   const { isOver, setNodeRef } = useDroppable({ id: status });
   const wip = tasks.length > 5;
@@ -155,7 +156,7 @@ function Column({ status, tasks, memberById, onAdd, onCardDelete }: {
   );
 }
 
-function DraggableTask({ task, member, onDelete }: { task: Task; member?: any; onDelete: () => void }) {
+function DraggableTask({ task, member, onDelete }: { task: Task; member?: Member | null; onDelete: () => void }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: task.id });
   return (
     <div
@@ -169,7 +170,7 @@ function DraggableTask({ task, member, onDelete }: { task: Task; member?: any; o
   );
 }
 
-function TaskCardView({ task, member, dragging, onDelete }: { task: Task; member?: any; dragging?: boolean; onDelete?: () => void }) {
+function TaskCardView({ task, member, dragging, onDelete }: { task: Task; member?: Member | null; dragging?: boolean; onDelete?: () => void }) {
   const due = task.due_date ? parseISO(task.due_date) : null;
   return (
     <article

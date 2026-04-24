@@ -45,7 +45,7 @@ export function ProjectForm({ onDone }: Props) {
               className="w-9 h-9 rounded-full ring-2 ring-offset-2 transition-all"
               style={{
                 backgroundColor: c.value,
-                // @ts-ignore custom prop
+                 // @ts-expect-error custom prop
                 "--tw-ring-color": color === c.value ? c.value : "transparent",
               } as React.CSSProperties}
               aria-label={c.name}

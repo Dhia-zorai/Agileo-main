@@ -30,8 +30,8 @@ export default function MyTasksPage() {
     if (tasks.length === 0) return;
     const ids = Array.from(new Set(tasks.map((t) => t.project_id)));
     supabase.from("projects").select("id, name, color").in("id", ids).then(({ data }) => {
-      const m: Record<string, any> = {};
-      (data ?? []).forEach((p: any) => (m[p.id] = p));
+      const m: Record<string, { name: string; color: string }> = {};
+      (data ?? []).forEach((p) => { m[p.id] = { name: p.name, color: p.color }; });
       setProjectMap(m);
     });
   }, [tasks]);

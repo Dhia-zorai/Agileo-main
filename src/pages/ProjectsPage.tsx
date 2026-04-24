@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Folders, Trash2 } from "lucide-react";
-import { useProjects } from "@/hooks/useProjects";
+import { useProjects, type Project } from "@/hooks/useProjects";
 import { useMembers } from "@/hooks/useMembers";
 import { useAuth } from "@/hooks/useAuth";
 import { AppShell } from "@/components/layout/AppShell";
@@ -73,7 +73,7 @@ export default function ProjectsPage() {
   );
 }
 
-function ProjectCard({ project, onClick, onDelete }: { project: any; onClick: () => void; onDelete: () => void }) {
+function ProjectCard({ project, onClick, onDelete }: { project: Project; onClick: () => void; onDelete: () => void }) {
   const { user } = useAuth();
   const { data: members } = useMembers(project.id);
   const isOwner = project.owner_id === user?.id;
