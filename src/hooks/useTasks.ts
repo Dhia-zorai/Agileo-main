@@ -18,6 +18,7 @@ export type Task = {
   sort_order: number;
   created_by: string;
   created_at: string;
+  updated_at?: string;
 };
 
 export function useTasks(projectId?: string): { data: Task[]; loading: boolean; error: string | null; reload: () => void; create: (input: Partial<Task> & { title: string; status: Task["status"] }) => Promise<Task | null>; update: (id: string, input: Partial<Pick<Task, "sprint_id" | "title" | "description" | "priority" | "story_points" | "assignee_id" | "due_date">>) => Promise<boolean>; updateStatus: (id: string, status: Task["status"]) => Promise<void>; remove: (id: string) => Promise<void>; } {

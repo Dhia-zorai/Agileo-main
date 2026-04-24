@@ -12,6 +12,7 @@ import { KanbanBoard } from "@/components/kanban/KanbanBoard";
 import { MembersTab } from "@/components/members/MembersTab";
 import { SprintsTab } from "@/components/sprints/SprintsTab";
 import { BacklogTab } from "@/components/backlog/BacklogTab";
+import { ReportsTab } from "@/components/reports/ReportsTab";
 import { EmptyState } from "@/components/EmptyState";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { Construction } from "lucide-react";
@@ -87,8 +88,9 @@ export default function ProjectDetailPage() {
         {tab === "backlog" && <BacklogTab projectId={id} />}
         {tab === "sprints" && <SprintsTab projectId={id} />}
         {tab === "members" && <MembersTab projectId={id} />}
-        {(tab === "chat" || tab === "reports") && (
-          <EmptyState icon={Construction} title="Coming in Phase 2" description={`The ${tab} view ships in the next release.`} />
+        {tab === "reports" && <ReportsTab projectId={id} />}
+        {tab === "chat" && (
+          <EmptyState icon={Construction} title="Coming in Phase 2" description="The chat view ships in the next release." />
         )}
       </div>
 
