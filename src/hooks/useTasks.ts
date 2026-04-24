@@ -43,26 +43,26 @@ export function useTasks(projectId?: string): { data: Task[]; loading: boolean; 
     load();
   }, [load]);
 
-  // realtime enabled – project scoped (fixed for Supabase v2)
-  useEffect(() => {
-    if (!projectId) return;
-    
-    const channel = supabase.channel(`tasks-${projectId}`);
-    
-    channel.on(
-      "postgres_changes",
-      { event: "*", schema: "public", table: "tasks", filter: `project_id=eq.${projectId}` },
-      () => {
-        load();
-      }
-    );
-    
-    channel.subscribe();
-    
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [projectId, load]);
+  // realtime disabled - causing white screen issues
+  // useEffect(() => {
+  //   if (!projectId) return;
+  //   
+  //   const channel = supabase.channel(`tasks-${projectId}`);
+  //   
+  //   channel.on(
+  //     "postgres_changes",
+  //     { event: "*", schema: "public", table: "tasks", filter: `project_id=eq.${projectId}` },
+  //     () => {
+  //       load();
+  //     }
+  //   );
+  //   
+  //   channel.subscribe();
+  //   
+  //   return () => {
+  //     supabase.removeChannel(channel);
+  //   };
+  // }, [projectId, load]);
 
   const create = async (input: Partial<Task> & { title: string; status: Task["status"] }) => {
     if (!user || !projectId) return;
@@ -146,26 +146,26 @@ export function useMyTasks() {
     load();
   }, [user, load]);
 
-  // realtime enabled – user scoped (fixed for Supabase v2)
-  useEffect(() => {
-    if (!user) return;
-    
-    const channel = supabase.channel(`my-tasks-${user.id}`);
-    
-    channel.on(
-      "postgres_changes",
-      { event: "*", schema: "public", table: "tasks" },
-      () => {
-        load();
-      }
-    );
-    
-    channel.subscribe();
-    
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user, load]);
+  // realtime disabled - causing white screen issues
+  // useEffect(() => {
+  //   if (!user) return;
+  //   
+  //   const channel = supabase.channel(`my-tasks-${user.id}`);
+  //   
+  //   channel.on(
+  //     "postgres_changes",
+  //     { event: "*", schema: "public", table: "tasks" },
+  //     () => {
+  //       load();
+  //     }
+  //   );
+  //   
+  //   channel.subscribe();
+  //   
+  //   return () => {
+  //     supabase.removeChannel(channel);
+  //   };
+  // }, [user, load]);
 
   return { data, loading, reload: load };
 }

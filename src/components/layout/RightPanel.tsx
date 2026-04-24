@@ -42,8 +42,8 @@ const ch = supabase.channel("right-panel-tasks");
     
     ch.subscribe();
     
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     return () => {
-      // @ts-expect-error ch is used in return
       supabase.removeChannel(ch);
     };
   }, [user]);
