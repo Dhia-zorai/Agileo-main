@@ -20,7 +20,7 @@ export type Task = {
   created_at: string;
 };
 
-export function useTasks(projectId?: string): { data: Task[]; loading: boolean; error: string | null; reload: () => void; create: (input: Partial<Task> & { title: string; status: Task["status"] }) => Promise<Task | null>; updateStatus: (id: string, status: Task["status"]) => Promise<void>; remove: (id: string) => Promise<void>; } {
+export function useTasks(projectId?: string): { data: Task[]; loading: boolean; error: string | null; reload: () => void; create: (input: Partial<Task> & { title: string; status: Task["status"] }) => Promise<Task | null>; update: (id: string, input: Partial<Pick<Task, "sprint_id" | "title" | "description" | "priority" | "story_points" | "assignee_id" | "due_date">>) => Promise<boolean>; updateStatus: (id: string, status: Task["status"]) => Promise<void>; remove: (id: string) => Promise<void>; } {
   const { user } = useAuth();
   const [data, setData] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
@@ -96,6 +96,16 @@ export function useTasks(projectId?: string): { data: Task[]; loading: boolean; 
     }
   };
 
+  const update = async (id: string, input: Partial<Pick<Task, "sprint_id" | "title" | "description" | "priority" | "story_points" | "assignee_id" | "due_date">>) => {
+    const { error: err } = await supabase.from("tasks").update(input).eq("id", id);
+    if (err) {
+      toast.error(err.message);
+      return false;
+    }
+    setData((d) => d.map((t) => (t.id === id ? { ...t, ...input } : t)));
+    return true;
+  };
+
   const remove = async (id: string) => {
     const { error: err } = await supabase.from("tasks").delete().eq("id", id);
     if (err) {
@@ -106,7 +116,7 @@ export function useTasks(projectId?: string): { data: Task[]; loading: boolean; 
     setData((d) => d.filter((t) => t.id !== id));
   };
 
-  return { data, loading, error, reload: load, create, updateStatus, remove };
+  return { data, loading, error, reload: load, create, update, updateStatus, remove };
 }
 
 // US4 — tasks assigned to me, across all projects
