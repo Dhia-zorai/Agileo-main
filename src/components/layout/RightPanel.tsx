@@ -30,14 +30,22 @@ export function RightPanel() {
       setRecent(all.slice(0, 5));
     };
     load();
-     const ch = supabase
-       .channel("right-panel-tasks")
-       .on("postgres_changes", { event: "*", schema: "public", table: "tasks" }, load)
-       .subscribe();
-     return () => {
-       // @ts-expect-error ch is used in return
-       supabase.removeChannel(ch);
-     };
+const ch = supabase.channel("right-panel-tasks");
+    
+    ch.on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "tasks" },
+      () => {
+        load();
+      }
+    );
+    
+    ch.subscribe();
+    
+    return () => {
+      // @ts-expect-error ch is used in return
+      supabase.removeChannel(ch);
+    };
   }, [user]);
 
   return (

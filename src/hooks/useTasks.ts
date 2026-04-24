@@ -43,21 +43,26 @@ export function useTasks(projectId?: string): { data: Task[]; loading: boolean; 
     load();
   }, [load]);
 
-  // realtime disabled - causing errors with Supabase v2
-  // useEffect(() => {
-  //   if (!projectId) return;
-  //   const ch = supabase
-  //     .channel(`tasks-${projectId}`)
-  //     .on(
-  //       "postgres_changes",
-  //       { event: "*", schema: "public", table: "tasks", filter: `project_id=eq.${projectId}` },
-  //       () => load(),
-  //     )
-  //     .subscribe();
-  //   return () => {
-  //     supabase.removeChannel(ch);
-  //   };
-  // }, [projectId, load]);
+  // realtime enabled – project scoped (fixed for Supabase v2)
+  useEffect(() => {
+    if (!projectId) return;
+    
+    const channel = supabase.channel(`tasks-${projectId}`);
+    
+    channel.on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "tasks", filter: `project_id=eq.${projectId}` },
+      () => {
+        load();
+      }
+    );
+    
+    channel.subscribe();
+    
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [projectId, load]);
 
   const create = async (input: Partial<Task> & { title: string; status: Task["status"] }) => {
     if (!user || !projectId) return;
@@ -141,17 +146,26 @@ export function useMyTasks() {
     load();
   }, [user, load]);
 
-  // realtime disabled - causing errors with Supabase v2
-  // useEffect(() => {
-  //   if (!user) return;
-  //   const ch = supabase
-  //     .channel(`my-tasks-${user.id}`)
-  //     .on("postgres_changes", { event: "*", schema: "public", table: "tasks" }, load)
-  //     .subscribe();
-  //   return () => {
-  //     supabase.removeChannel(ch);
-  //   };
-  // }, [user, load]);
+  // realtime enabled – user scoped (fixed for Supabase v2)
+  useEffect(() => {
+    if (!user) return;
+    
+    const channel = supabase.channel(`my-tasks-${user.id}`);
+    
+    channel.on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "tasks" },
+      () => {
+        load();
+      }
+    );
+    
+    channel.subscribe();
+    
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, load]);
 
   return { data, loading, reload: load };
 }
