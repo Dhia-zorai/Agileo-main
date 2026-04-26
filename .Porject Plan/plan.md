@@ -12,17 +12,18 @@ A Scrum project management dashboard with auth, projects, kanban, and personal t
 - US3 — Create tasks
 - US4 — View my tasks
 - US5 — Change task status (drag & drop)
+- Backlog/Stories full table, Sprints lifecycle, Reports (Burndown/Velocity).
 
-**Deferred to Phase 2:** Dashboard charts (US6), Chat (US7), File sharing (US8), Backlog/Stories full table, Sprints lifecycle, Reports (Burndown/Velocity).
 
+**Deferred to Phase 2:** Dashboard charts (US6), Chat (US7), File sharing (US8),
 ## Auth & Users
-- Email/password sign up + sign in (Lovable Cloud)
+- Email/password sign up + sign in 
 - `/auth` page with Sign In / Sign Up tabs
 - `profiles` table auto-created on signup (name, avatar_color, role)
 - All app routes protected; redirect to `/auth` when signed out
 - "Current user" everywhere = the logged-in profile
 
-## Database (Lovable Cloud / Postgres + RLS)
+## Database (Postgres + RLS)
 - `profiles` — id (→auth.users), name, email, avatar_color, role
 - `user_roles` — separate table with `app_role` enum (admin / scrum_master / developer / product_owner)
 - `projects` — id, name, description, color, status, owner_id, created_at
@@ -77,11 +78,11 @@ On first run, a "Seed demo data" button on the empty Projects page inserts:
 - 12 tasks spread across all 4 kanban columns, assigned to current user + invited demo profiles
 
 ## Conventions
-- Plain JavaScript per your spec — `.jsx` files (no TypeScript in feature code; shadcn primitives stay as-is)
+- Plain JavaScript — `.jsx` files (no TypeScript in feature code; shadcn primitives stay as-is)
 - Each component header comment cites its User Story (e.g. `// US3 — Create Tasks`)
 - All deletes go through ConfirmDialog
 - Mobile responsive throughout
 
 ## Out of scope (Phase 2)
-DonutChart (pure SVG), BurndownChart, VelocityChart, ChatPanel with polling, BacklogTable + UserStoryForm + MoSCoW, full Sprints lifecycle (start/complete/burndown), file uploads on tasks.
+DonutChart (pure SVG), BurndownChart, VelocityChart, ChatPanel with polling,  UserStoryForm + MoSCoW, full Sprints lifecycle (start/complete/burndown), file uploads on tasks.
 
