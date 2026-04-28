@@ -22,6 +22,7 @@ Ce projet a été développé pour simplifier l'adoption des méthodologies Agil
 - **Backend & Database** : Supabase (PostgreSQL, Auth, Real-time sync).
 - **Gestion d'État & Hooks** : React Hooks personnalisés pour une logique métier claire.
 - **Drag & Drop** : @dnd-kit pour une manipulation fluide des tâches.
+- **Gestionnaire de Paquets** : pnpm (pour la rapidité et l'efficacité).
 - **Déploiement** : Optimisé pour Vercel.
 
 ## 🚀 Installation Locale
@@ -33,10 +34,10 @@ Ce projet a été développé pour simplifier l'adoption des méthodologies Agil
    cd Agileo
    ```
 
-2. **Lancer l'application** (nécessite Node.js)
+2. **Lancer l'application** (nécessite Node.js et pnpm)
    ```bash
-   npm install
-   npm run dev
+   pnpm install
+   pnpm run dev
    ```
    _Le site sera disponible sur `http://localhost:8080`._
 
